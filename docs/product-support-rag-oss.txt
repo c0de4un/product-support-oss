@@ -1,0 +1,2269 @@
+=====================================================================
+PROJECT OVERVIEW
+=====================================================================
+
+Project name:
+    Product Support OSS
+
+Repository name:
+    product-support-oss
+
+Short name:
+    Product Support
+
+Type:
+    Open-source demo repository / portfolio project / commercial seed
+
+Domain:
+    AI Engineering, RAG, e-commerce support automation, product catalog
+    assistant, technical support chatbot, knowledge base search.
+
+Primary stack:
+    - Rust
+    - Axum
+    - SQLite3
+    - Qdrant
+    - Docker
+    - Qwen 2.5 LLM
+    - Local embedding model via Docker runtime
+    - Vue 3 / Nuxt 3
+    - TypeScript
+
+License:
+    MIT for open-source demo core.
+    Commercial extensions may later be placed in a separate private
+    repository or under a commercial license.
+
+=====================================================================
+1. PROJECT PURPOSE
+=====================================================================
+
+Product Support OSS is a local RAG-based AI support assistant for
+e-commerce product catalogs.
+
+It answers customer support questions using store data:
+
+    - products;
+    - product descriptions;
+    - technical specifications;
+    - manuals;
+    - FAQ;
+    - delivery and return policies;
+    - warranty rules;
+    - category knowledge.
+
+The system is designed for scenarios like:
+
+    - Seller support assistant.
+    - Product catalog support chatbot.
+    - E-commerce first-line support.
+    - Internal assistant for marketplace managers.
+    - Product knowledge base search.
+    - Support ticket deflection.
+    - Future PIM/ERP/e-commerce integration layer.
+
+The main idea:
+
+    User creates a store.
+    Store contains products.
+    Products contain descriptions and technical specifications.
+    Backend transforms product data into knowledge chunks.
+    Chunks are embedded and stored in Qdrant.
+    User asks a question.
+    System retrieves relevant product knowledge from Qdrant.
+    Qwen 2.5 generates a grounded answer.
+    UI shows answer and sources.
+    Dashboard shows token usage, latency, retrieval stats, and errors.
+
+This project demonstrates practical AI Engineering skills:
+
+    - RAG pipeline;
+    - product knowledge ingestion;
+    - chunking;
+    - embeddings;
+    - Qdrant vector search;
+    - metadata filtering by store/product;
+    - prompt construction;
+    - local LLM integration;
+    - token usage tracking;
+    - hallucination guardrails;
+    - Rust backend;
+    - SQLite persistence;
+    - Docker deployment;
+    - Nuxt frontend;
+    - observability dashboard.
+
+=====================================================================
+2. PRODUCT VISION
+=====================================================================
+
+Product Support OSS is a reusable AI support primitive for e-commerce.
+
+It can be used as:
+
+    1. A standalone local product support chatbot.
+    2. A support assistant for stores and marketplaces.
+    3. An internal knowledge assistant for product managers/support.
+    4. A first-line support layer before human escalation.
+    5. A product documentation and catalog search replacement.
+    6. A demo of production-like RAG architecture.
+    7. A seed for a commercial AI support SaaS.
+
+Long-term commercial direction:
+
+    Product Support OSS may evolve into a commercial AI support product:
+        - multi-store workspaces;
+        - user roles and permissions;
+        - support ticket integration;
+        - PIM/ERP/e-commerce connectors;
+        - analytics dashboard;
+        - feedback loop;
+        - human escalation;
+        - sentiment-based routing;
+        - API keys;
+        - webhook notifications;
+        - cloud deployment;
+        - usage-based billing.
+
+The project is also the foundation for the future commercial product
+korgi.support.
+
+=====================================================================
+3. TARGET USERS
+=====================================================================
+
+Primary users:
+
+    1. E-commerce store owners.
+    2. Marketplace support teams.
+    3. Developers building AI support assistants.
+    4. Product teams needing product catalog chatbots.
+    5. Internal knowledge base owners.
+    6. Recruiters and technical interviewers reviewing AI Engineering skills.
+    7. Indie hackers building AI automation products.
+
+User pain:
+
+    - Support answers the same product questions repeatedly.
+    - Product data is scattered across descriptions, specs, FAQ, and docs.
+    - Generic LLM chatbots hallucinate.
+    - Answers lack sources.
+    - Local LLM integration is often messy.
+    - Vector search and retrieval quality are hard to debug.
+    - Token usage and latency are not visible.
+    - RAG quality is hard to evaluate.
+
+Value proposition:
+
+    Create a store, add products, index product knowledge, and get a
+    grounded AI assistant that answers product questions with sources,
+    token usage, latency, and quality controls.
+
+=====================================================================
+4. MVP SCOPE
+=====================================================================
+
+The MVP must support the following flow:
+
+    1. User creates a store.
+    2. User adds products manually or via API.
+    3. Backend transforms product data into knowledge chunks.
+    4. Chunks are embedded.
+    5. Embeddings are upserted into Qdrant.
+    6. Metadata is stored in SQLite.
+    7. User asks a question through UI or API.
+    8. Backend embeds the question.
+    9. Backend searches relevant chunks in Qdrant with store filter.
+    10. Optional keyword search can be performed via SQLite FTS5.
+    11. Backend builds a grounded prompt.
+    12. Qwen 2.5 generates an answer.
+    13. Backend stores conversation message and usage metrics.
+    14. UI displays answer and sources.
+    15. Dashboard shows token usage, latency, retrieval stats, errors.
+
+Core features:
+
+    1. Stores CRUD.
+    2. Products CRUD.
+    3. Product knowledge ingestion.
+    4. Chunking of descriptions, specs, FAQ, manuals.
+    5. Local embedding generation.
+    6. Qdrant collection management.
+    7. Qdrant point upsert/delete.
+    8. Metadata filtering by store_id/product_id.
+    9. SQLite storage for relational data.
+    10. Optional SQLite FTS5 keyword retrieval.
+    11. Hybrid retrieval: Qdrant vector + FTS keyword.
+    12. Top-K retrieval.
+    13. Source citations.
+    14. Qwen 2.5 chat integration.
+    15. Streaming answer support if practical.
+    16. Token usage tracking.
+    17. Latency tracking.
+    18. Request history.
+    19. Simple dashboard.
+    20. Docker Compose deployment.
+    21. Health endpoint.
+    22. OpenAPI/Swagger documentation if practical.
+
+Optional but desired MVP enhancements:
+
+    1. Reindex button in UI.
+    2. Products list page.
+    3. Chunk viewer.
+    4. Retrieval debug panel.
+    5. Conversation history.
+    6. Feedback thumbs up/down.
+    7. Evaluation dataset.
+    8. Lightweight mode with external OpenAI-compatible provider.
+    9. Cache for repeated questions.
+    10. CSV product import.
+
+=====================================================================
+5. NON-GOALS FOR MVP
+=====================================================================
+
+The MVP intentionally does not include:
+
+    1. Fine-tuning Qwen 2.5.
+    2. Multi-user authentication and roles.
+    3. Billing.
+    4. Multi-tenant cloud SaaS.
+    5. PDF/DOCX ingestion.
+    6. Web crawling.
+    7. PostgreSQL as primary database.
+    8. Qdrant clustering and production high availability.
+    9. Kubernetes production deployment.
+    10. Real-time collaborative support.
+    11. Full ticketing system.
+    12. CRM integrations.
+    13. Voice input/output.
+    14. Mobile native applications.
+    15. Legal compliance for enterprise support.
+
+These may be added later as commercial extensions.
+
+=====================================================================
+6. BUSINESS CASE
+=====================================================================
+
+Product Support OSS is an ideal e-commerce case for reducing support
+workload around product questions.
+
+Example use cases:
+
+    1. Product specification assistant:
+       Answers questions about material, size, color, power, capacity,
+       compatibility, and technical parameters.
+
+    2. Seller support assistant:
+       Answers questions about payouts, moderation, returns, commissions,
+       shipping, API, and account settings.
+
+    3. Product comparison helper:
+       Explains differences between products based on catalog data.
+
+    4. Support deflection layer:
+       Resolves common questions before creating a ticket.
+
+    5. Onboarding assistant:
+       Helps new sellers or customers understand product catalog.
+
+    6. Knowledge base analytics:
+       Shows frequent questions, weak product descriptions, and missing
+       answers.
+
+Commercial extension ideas:
+
+    - Multiple stores and workspaces.
+    - API keys.
+    - Webhooks.
+    - PIM connectors.
+    - ERP connectors.
+    - Marketplace connectors.
+    - Zendesk/HelpDesk integrations.
+    - Sentiment-based escalation.
+    - Human review workflow.
+    - Answer quality analytics.
+    - Team workspaces.
+    - Usage-based billing.
+    - Cloud LLM and local LLM routing.
+
+=====================================================================
+7. ECOSYSTEM CONTEXT
+=====================================================================
+
+Product Support OSS is part of the Korgi open-source ecosystem.
+
+Related projects:
+
+    Korgi.Beats:
+        Rust/Axum audio beat detection API.
+        Provides beat timestamps for rhythm-aware video editing.
+
+    Korgi.Vision:
+        Image understanding service using VLM.
+        Returns tags, quality score, and product visibility.
+
+    Korgi.Scenes:
+        Future or companion video scene detection service.
+        Uploads videos, detects scenes, cuts segments, extracts keyframes.
+
+    Korgi.Support:
+        RAG assistant over documentation and knowledge sources.
+
+    Product Support OSS:
+        E-commerce-oriented RAG assistant over stores, products,
+        specifications, and descriptions.
+
+    Korgi.Sentiment:
+        Existing Laravel Sentiment Engine.
+        May later integrate with Product Support for escalation based on
+        user emotion or message tone.
+
+Product Support OSS lies in the foundation of the future commercial
+product korgi.support and extends RAG from generic documentation to
+e-commerce product catalogs.
+
+=====================================================================
+8. HIGH-LEVEL ARCHITECTURE
+=====================================================================
+
+[UML-LIKE COMPONENT DIAGRAM]
+
++---------------------------------------------------------------+
+|                         User / Browser                        |
++---------------------------------------------------------------+
+                              |
+                              | HTTPS / HTTP
+                              v
++---------------------------------------------------------------+
+|                     Nuxt 3 Frontend                           |
+|                                                               |
+|  Pages:                                                       |
+|    - Chat                                                     |
+|    - Stores                                                   |
+|    - Products                                                 |
+|    - Dashboard                                                |
+|                                                               |
+|  Components:                                                  |
+|    - ChatWindow                                               |
+|    - MessageBubble                                            |
+|    - SourcesList                                              |
+|    - StoreTable                                               |
+|    - ProductTable                                             |
+|    - ReindexButton                                            |
+|    - MetricsCards                                             |
++---------------------------------------------------------------+
+                              |
+                              | REST / JSON / SSE
+                              v
++---------------------------------------------------------------+
+|                     Rust Axum Backend                         |
+|                                                               |
+|  Modules:                                                     |
+|    - api                                                      |
+|    - domain                                                   |
+|    - services                                                 |
+|    - rag                                                      |
+|    - llm                                                      |
+|    - embeddings                                               |
+|    - vector_store                                             |
+|    - db                                                       |
+|    - storage                                                  |
+|    - metrics                                                  |
+|                                                               |
+|  Responsibilities:                                            |
+|    - manage stores/products                                   |
+|    - ingest product knowledge                                 |
+|    - chunk product data                                       |
+|    - generate embeddings                                      |
+|    - upsert vectors into Qdrant                               |
+|    - retrieve relevant chunks                                 |
+|    - build grounded prompt                                    |
+|    - call Qwen 2.5                                            |
+|    - persist messages                                         |
+|    - persist token usage                                      |
+|    - expose dashboard metrics                                 |
++---------------------------------------------------------------+
+     |              |              |              |             |
+     | SQLite3      | Qdrant       | LLM          | Embedding   |
+     v              v              v              v             v
++-----------+  +-----------+  +-----------+  +------------------+
+| SQLite3   |  | Qdrant    |  | Qwen 2.5  |  | Embedding Model  |
+|           |  |           |  | Docker    |  | Docker runtime   |
+| stores    |  | vectors   |  | runtime   |  |                  |
+| products  |  | payloads  |  |           |  |                  |
+| chunks    |  | filters   |  |           |  |                  |
+| messages  |  |           |  |           |  |                  |
+| usage     |  |           |  |           |  |                  |
++-----------+  +-----------+  +-----------+  +------------------+
+
+Notes:
+
+    Qwen 2.5 is used as the chat LLM.
+    Embeddings are generated by a separate local embedding model.
+    LLM and embedding runtime may be provided by the same Docker
+    service, for example Ollama-compatible runtime.
+    Qdrant stores vector embeddings and searchable payloads.
+    SQLite stores relational source of truth and usage metrics.
+
+=====================================================================
+9. DEPLOYMENT VIEW
+=====================================================================
+
+[UML-LIKE DEPLOYMENT DIAGRAM]
+
+Docker Compose node: product-support-oss
+
++-----------------------------------------------------------------+
+|                         Docker Host                             |
+|                                                                 |
+|  +----------------------+    +-----------------------------+    |
+|  | frontend             |    | backend                     |    |
+|  | Nuxt 3               |--->| Rust Axum                   |    |
+|  | Port: 3000           |    | Port: 8081                  |    |
+|  +----------------------+    +-----------------------------+    |
+|                                       |                         |
+|                    +------------------+------------------+      |
+|                    |                  |                  |      |
+|                    v                  v                  v      |
+|          +----------------+  +----------------+  +-----------+  |
+|          | SQLite volume  |  | Qdrant service |  | LLM       |  |
+|          | ./data/db.sqlite| | Port: 6333     |  | Qwen 2.5  |  |
+|          +----------------+  | Volume:        |  +-----------+  |
+|                              | qdrant_storage |                 |
+|                              +----------------+                 |
+|                                                                 |
+|  +-----------------------------------------------------------+  |
+|  | embeddings                                                |  |
+|  | Optional separate embedding runtime                       |  |
+|  | May be same container as LLM runtime                      |  |
+|  +-----------------------------------------------------------+  |
+|                                                                 |
++-----------------------------------------------------------------+
+
+Networking:
+
+    Frontend calls backend through public API base URL.
+    Backend calls Qdrant via internal Docker network.
+    Backend calls LLM/embedding runtime via internal Docker network.
+    Qdrant and LLM runtime should not be publicly exposed in
+    production-like setup.
+
+Recommended environment variables:
+
+    APP_ENV=development
+    APP_HOST=0.0.0.0
+    APP_PORT=8081
+
+    DATABASE_URL=sqlite://./data/product_support.db
+    STORAGE_PATH=./data/storage
+
+    RUNTIME_MODE=standalone
+    # standalone = local Qwen 2.5 via Docker runtime
+    # lightweight = external OpenAI-compatible provider
+
+    LLM_BASE_URL=http://llm:11434
+    LLM_MODEL=qwen2.5:1.5b-instruct
+    LLM_TEMPERATURE=0.1
+    LLM_TIMEOUT_SECONDS=90
+    LLM_CONTEXT_LIMIT=4096
+
+    EMBEDDING_BASE_URL=http://llm:11434
+    EMBEDDING_MODEL=nomic-embed-text
+    VECTOR_DIM=768
+
+    QDRANT_URL=http://qdrant:6333
+    QDRANT_API_KEY=
+    QDRANT_COLLECTION=product_support_chunks
+    QDRANT_TIMEOUT_SECONDS=30
+
+    CHUNK_SIZE=800
+    CHUNK_OVERLAP=120
+    TOP_K=6
+    RETRIEVAL_MODE=hybrid
+
+    INTERNAL_API_TOKEN=change-me
+
+=====================================================================
+10. CORE USER FLOWS
+=====================================================================
+
+Flow 1: Store and product creation
+
+    1. User creates a store via UI or API.
+    2. User adds products via UI or API.
+    3. Product contains:
+        - name;
+        - category;
+        - description;
+        - specs;
+        - manual;
+        - FAQ;
+        - status.
+    4. Backend stores product in SQLite.
+
+Flow 2: Knowledge ingestion
+
+    1. Backend receives reindex request or product create/update event.
+    2. Backend loads products for selected store.
+    3. Backend transforms product fields into knowledge chunks.
+    4. Backend computes chunk identifiers and hashes.
+    5. Backend generates embeddings for chunks.
+    6. Backend upserts points into Qdrant.
+    7. Backend stores chunk metadata in SQLite.
+    8. Backend stores qdrant_point_id in SQLite chunks table.
+
+Flow 3: User asks a question
+
+    1. User opens Nuxt frontend.
+    2. User selects store.
+    3. User types a question.
+    4. Frontend sends POST /api/v1/chat.
+    5. Backend embeds the question.
+    6. Backend searches Qdrant with store_id filter.
+    7. Optional SQLite FTS5 keyword search is performed.
+    8. Backend merges retrieval results.
+    9. Backend builds grounded prompt.
+    10. Backend calls Qwen 2.5.
+    11. Backend streams or returns answer.
+    12. Backend stores message and usage metrics.
+    13. UI displays answer and sources.
+
+Flow 4: Reindex products
+
+    1. User opens Products page.
+    2. User clicks Reindex.
+    3. Backend scans selected store products.
+    4. Backend deletes outdated Qdrant points.
+    5. Backend regenerates chunks and embeddings.
+    6. Backend upserts new points.
+    7. Backend shows indexing status.
+
+Flow 5: Dashboard inspection
+
+    1. User opens Dashboard page.
+    2. Backend returns summary metrics.
+    3. UI displays:
+        - total stores;
+        - total products;
+        - total chunks;
+        - Qdrant points count;
+        - total chats;
+        - success rate;
+        - total tokens;
+        - average latency;
+        - cache hits;
+        - retrieval statistics;
+        - recent errors.
+
+=====================================================================
+11. UML-LIKE SEQUENCE DIAGRAM: RAG CHAT WITH QDRANT
+=====================================================================
+
+[SEQUENCE DIAGRAM]
+
+User                Nuxt UI              Rust API              SQLite              Qdrant              LLM Runtime
+ |                     |                     |                    |                    |                    |
+ | ask question        |                     |                    |                    |                    |
+ |-------------------->|                     |                    |                    |                    |
+ |                     | POST /chat          |                    |                    |                    |
+ |                     |-------------------->|                    |                    |                    |
+ |                     |                     | create conversation|                    |                    |
+ |                     |                     |--------------------+                    |                    |
+ |                     |                     | embed question     |                    |                    |
+ |                     |                     |------------------------------------------------------------------------------------------>
+ |                     |                     |                    |                    |                    |
+ |                     |                     | vector search      |                    |                    |
+ |                     |                     |----------------------------------------------------------->|
+ |                     |                     |                    |                    |                    |
+ |                     |                     | relevant points    |                    |                    |
+ |                     |                     |<-----------------------------------------------------------|
+ |                     |                     | fetch chunk texts  |                    |                    |
+ |                     |                     |------------------->|                    |                    |
+ |                     |                     | chunk metadata     |                    |                    |
+ |                     |                     |<-------------------|                    |                    |
+ |                     |                     | build prompt       |                    |                    |
+ |                     |                     | send prompt        |                    |                    |
+ |                     |                     |------------------------------------------------------------------------------------------>
+ |                     |                     |                    |                    |                    |
+ |                     |                     |                                                    answer stream
+ |                     |                     |<-----------------------------------------------------------------------------------------|
+ |                     | stream answer       |                    |                    |                    |
+ |                     |<--------------------|                    |                    |                    |
+ |                     |                     | save message       |                    |                    |
+ |                     |                     |------------------->|                    |                    |
+ |                     |                     | save usage         |                    |                    |
+ |                     |                     |------------------->|                    |                    |
+ | show answer/sources |                     |                    |                    |                    |
+ |<--------------------|                     |                    |                    |                    |
+
+=====================================================================
+12. DOMAIN MODEL
+=====================================================================
+
+[UML-LIKE CLASS / ENTITY DIAGRAM]
+
++------------------+
+|      Store       |
++------------------+
+| id               |
+| name             |
+| description      |
+| status           |
+| created_at       |
++------------------+
+         |
+         | 1
+         |
+         | *
++------------------+
+|     Product      |
++------------------+
+| id               |
+| store_id         |
+| name             |
+| category         |
+| description      |
+| specs            |
+| manual           |
+| faq              |
+| status           |
+| external_id      |
+| source           |
+| created_at       |
+| updated_at       |
++------------------+
+         |
+         | 1
+         |
+         | *
++------------------+
+|      Chunk       |
++------------------+
+| id               |
+| product_id       |
+| store_id         |
+| source_type      |
+| field_path       |
+| section_title    |
+| content          |
+| content_hash     |
+| chunk_index      |
+| token_estimate   |
+| qdrant_point_id  |
+| embedding_model  |
+| vector_dim       |
+| indexed_at       |
+| created_at       |
++------------------+
+
++------------------+
+|  Conversation    |
++------------------+
+| id               |
+| store_id         |
+| title            |
+| context          |
+| created_at       |
++------------------+
+         |
+         | 1
+         |
+         | *
++------------------+
+|     Message      |
++------------------+
+| id               |
+| conversation_id  |
+| role             |
+| content          |
+| sources          |
+| model            |
+| provider         |
+| latency_ms       |
+| cached           |
+| error_message    |
+| created_at       |
++------------------+
+         |
+         | 1
+         |
+         | 1
++------------------+
+|   UsageMetric    |
++------------------+
+| id               |
+| message_id       |
+| prompt_tokens    |
+| completion_tokens|
+| total_tokens     |
+| token_source     |
+| estimated_cost   |
+| created_at       |
++------------------+
+
+Notes:
+
+    sources stored as JSON array:
+        [
+          {
+            "type": "product_spec",
+            "store_id": "...",
+            "product_id": "...",
+            "product_name": "...",
+            "field_path": "specs.material",
+            "chunk_id": "...",
+            "score": 0.82
+          }
+        ]
+
+    role values:
+        user
+        assistant
+        system
+
+    source_type values:
+        product_name
+        product_description
+        product_spec
+        product_manual
+        product_faq
+        store_policy
+
+=====================================================================
+13. STATE MACHINE: PRODUCT KNOWLEDGE INDEXING
+=====================================================================
+
+[UML-LIKE STATE DIAGRAM]
+
++-----------+
+| pending   |
++-----------+
+     |
+     | load product data
+     v
++------------+
+| parsing    |
++------------+
+     |
+     | chunking
+     v
++------------+
+| chunking   |
++------------+
+     |
+     | embedding
+     v
++------------+
+| embedding  |
++------------+
+     |
+     | qdrant upsert
+     v
++------------+
+| upserting  |
++------------+
+     |                    |
+     | success            | error
+     v                    v
++------------+      +----------+
+| indexed    |      | failed   |
++------------+      +----------+
+                          |
+                          | retry if allowed
+                          v
+                    +------------+
+                    | parsing    |
+                    +------------+
+
+=====================================================================
+14. API DESIGN
+=====================================================================
+
+Base URL:
+
+    /api/v1
+
+Endpoints:
+
+---------------------------------------------------------------
+GET /api/v1/health
+---------------------------------------------------------------
+
+Purpose:
+    Check service, SQLite, Qdrant, docs/products, LLM, embeddings.
+
+Response:
+    {
+      "status": "ok",
+      "database": "ok",
+      "qdrant": "ok",
+      "qdrant_collection": "product_support_chunks",
+      "llm": "ok",
+      "embeddings": "ok",
+      "llm_model": "qwen2.5:1.5b-instruct",
+      "embedding_model": "nomic-embed-text",
+      "stores": 1,
+      "products": 12,
+      "chunks": 245,
+      "qdrant_points": 245,
+      "version": "0.1.0"
+    }
+
+---------------------------------------------------------------
+POST /api/v1/stores
+---------------------------------------------------------------
+
+Purpose:
+    Create store.
+
+Request:
+    {
+      "name": "Demo Store",
+      "description": "Store for demo products"
+    }
+
+---------------------------------------------------------------
+GET /api/v1/stores
+---------------------------------------------------------------
+
+Purpose:
+    List stores.
+
+---------------------------------------------------------------
+GET /api/v1/stores/{id}
+---------------------------------------------------------------
+
+Purpose:
+    Get store.
+
+---------------------------------------------------------------
+POST /api/v1/stores/{store_id}/products
+---------------------------------------------------------------
+
+Purpose:
+    Add product.
+
+Request:
+    {
+      "name": "Red T-shirt with print",
+      "category": "Clothing",
+      "description": "Cotton t-shirt with bright print.",
+      "specs": {
+        "material": "cotton",
+        "color": "red",
+        "sizes": ["S", "M", "L"]
+      },
+      "manual": "Wash at 30 degrees.",
+      "faq": [
+        {
+          "question": "Can I return this product?",
+          "answer": "Yes, within 14 days."
+        }
+      ],
+      "external_id": "SKU-123",
+      "source": "manual"
+    }
+
+---------------------------------------------------------------
+GET /api/v1/stores/{store_id}/products
+---------------------------------------------------------------
+
+Purpose:
+    List products.
+
+---------------------------------------------------------------
+PATCH /api/v1/products/{id}
+---------------------------------------------------------------
+
+Purpose:
+    Update product.
+
+---------------------------------------------------------------
+DELETE /api/v1/products/{id}
+---------------------------------------------------------------
+
+Purpose:
+    Delete product and related Qdrant points.
+
+---------------------------------------------------------------
+POST /api/v1/ingest/reindex
+---------------------------------------------------------------
+
+Purpose:
+    Rebuild or update product knowledge index.
+
+Query params:
+    store_id optional
+    force=true optional
+
+Response:
+    {
+      "job_id": "uuid",
+      "status": "running",
+      "stores_selected": 1,
+      "products_found": 12
+    }
+
+---------------------------------------------------------------
+GET /api/v1/ingest/status
+---------------------------------------------------------------
+
+Purpose:
+    Get ingestion status.
+
+---------------------------------------------------------------
+GET /api/v1/chunks
+---------------------------------------------------------------
+
+Purpose:
+    Inspect indexed chunks.
+
+Query params:
+    store_id
+    product_id
+    limit
+    offset
+
+---------------------------------------------------------------
+POST /api/v1/chat
+---------------------------------------------------------------
+
+Purpose:
+    Ask a question.
+
+Request:
+    {
+      "store_id": "store_123",
+      "question": "What material is the red t-shirt made of?",
+      "conversation_id": "optional",
+      "stream": true
+    }
+
+Response:
+    {
+      "conversation_id": "uuid",
+      "message_id": "uuid",
+      "answer": "The red t-shirt is made of cotton.",
+      "sources": [
+        {
+          "type": "product_spec",
+          "product_id": "product_456",
+          "product_name": "Red T-shirt with print",
+          "field_path": "specs.material",
+          "chunk_id": "chunk_789",
+          "score": 0.82
+        }
+      ],
+      "meta": {
+        "model": "qwen2.5:1.5b-instruct",
+        "provider": "local",
+        "cached": false,
+        "latency_ms": 1620,
+        "retrieval": {
+          "mode": "hybrid",
+          "vector_store": "qdrant",
+          "collection": "product_support_chunks",
+          "top_k": 6,
+          "chunks_found": 6
+        },
+        "tokens": {
+          "prompt_tokens": 820,
+          "completion_tokens": 120,
+          "total_tokens": 940,
+          "token_source": "api_reported"
+        }
+      }
+    }
+
+---------------------------------------------------------------
+GET /api/v1/conversations
+---------------------------------------------------------------
+
+Purpose:
+    List chat conversations.
+
+---------------------------------------------------------------
+GET /api/v1/conversations/{id}/messages
+---------------------------------------------------------------
+
+Purpose:
+    Get conversation history.
+
+---------------------------------------------------------------
+GET /api/v1/metrics/summary
+---------------------------------------------------------------
+
+Purpose:
+    Dashboard metrics.
+
+Response:
+    {
+      "stores": 1,
+      "products": 12,
+      "chunks": 245,
+      "qdrant_points": 245,
+      "conversations": 12,
+      "messages": 64,
+      "successful": 61,
+      "failed": 3,
+      "cache_hits": 8,
+      "tokens": {
+        "prompt": 42000,
+        "completion": 9600,
+        "total": 51600
+      },
+      "latency": {
+        "avg_ms": 1550,
+        "p95_ms": 2400
+      },
+      "retrieval": {
+        "avg_chunks_retrieved": 5.7,
+        "avg_top_score": 0.76
+      }
+    }
+
+=====================================================================
+15. PROMPT DESIGN
+=====================================================================
+
+Design principles:
+
+    1. Prompt must be grounded in retrieved product knowledge.
+    2. Model must not use outside knowledge when context is enough.
+    3. Model must cite source numbers.
+    4. Model must say when product data does not contain an answer.
+    5. Temperature should be low.
+    6. Prompt should be versioned.
+    7. Prompt should be safe against prompt injection.
+    8. Retrieved chunks are data, not instructions.
+    9. Answer should be concise.
+    10. Backend should store prompt metadata for debugging.
+
+Example system prompt:
+
+    You are an e-commerce product support assistant.
+    Answer only using the provided product knowledge chunks.
+    If the provided chunks do not contain enough information, say:
+    "The provided product data does not contain an exact answer."
+    Do not invent specifications, prices, deadlines, warranty terms,
+    delivery rules, or compatibility.
+    Use citations like [1], [2] when referring to chunks.
+    Be concise and helpful.
+
+Example user prompt:
+
+    Store: {store_name}
+    Question: {question}
+
+    Product knowledge chunks:
+
+    [1] Product: Red T-shirt with print
+    Field: specs.material
+    Content: cotton
+
+    [2] Product: Red T-shirt with print
+    Field: description
+    Content: Cotton t-shirt with bright print.
+
+    Answer the question using only these chunks.
+    Include citations.
+
+=====================================================================
+16. RETRIEVAL DESIGN WITH QDRANT
+=====================================================================
+
+Qdrant role:
+
+    Qdrant is the vector database used for semantic retrieval of
+    product knowledge chunks.
+
+Collection:
+
+    product_support_chunks
+
+Vector config:
+
+    {
+      "size": VECTOR_DIM,
+      "distance": "Cosine"
+    }
+
+Payload fields:
+
+    {
+      "store_id": "uuid",
+      "product_id": "uuid",
+      "chunk_id": "uuid",
+      "source_type": "product_spec",
+      "field_path": "specs.material",
+      "product_name": "Red T-shirt with print",
+      "section_title": "Specifications",
+      "content": "cotton",
+      "content_hash": "sha256",
+      "embedding_model": "nomic-embed-text",
+      "vector_dim": 768,
+      "updated_at": "2026-08-27T12:00:00Z"
+    }
+
+Recommended payload indexes:
+
+    store_id
+    product_id
+    source_type
+    updated_at
+
+Retrieval flow:
+
+    1. Embed user question.
+    2. Search Qdrant collection.
+    3. Apply mandatory store_id filter.
+    4. Optional product_id filter.
+    5. Retrieve top K points.
+    6. Load chunk metadata from SQLite if needed.
+    7. Optional SQLite FTS5 keyword search.
+    8. Merge results using score fusion.
+    9. Select final top K chunks.
+    10. Build prompt.
+
+Hybrid scoring example:
+
+    final_score =
+        0.6 * qdrant_score_normalized
+      + 0.4 * fts_score_normalized
+
+Chunking rules:
+
+    - Product name becomes a separate searchable chunk.
+    - Description is split into chunks.
+    - Each spec key/value can become a chunk.
+    - FAQ question/answer pairs become chunks.
+    - Manual text is split by headings or length.
+    - Store policy text can be attached as store-level chunks.
+    - Default chunk size: 600-1000 characters.
+    - Default overlap: 80-160 characters.
+    - Avoid chunks smaller than 80 characters.
+    - Avoid chunks larger than 2000 characters.
+
+Retrieval quality controls:
+
+    - If top score is too low, answer with low-confidence notice.
+    - If no chunks found, say product data has no answer.
+    - Do not force an answer.
+    - Store retrieval debug metadata.
+    - Show sources in UI.
+
+=====================================================================
+17. DATABASE DESIGN: SQLITE3 + QDRANT
+=====================================================================
+
+SQLite is used as relational source of truth.
+Qdrant is used as vector search storage.
+
+Recommended SQLite settings:
+
+    PRAGMA journal_mode=WAL;
+    PRAGMA synchronous=NORMAL;
+    PRAGMA foreign_keys=ON;
+    PRAGMA busy_timeout=5000;
+
+Schema draft:
+
+---------------------------------------------------------------
+TABLE stores
+---------------------------------------------------------------
+
+CREATE TABLE stores (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+---------------------------------------------------------------
+TABLE products
+---------------------------------------------------------------
+
+CREATE TABLE products (
+    id TEXT PRIMARY KEY,
+    store_id TEXT NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    category TEXT,
+    description TEXT,
+    specs TEXT,
+    manual TEXT,
+    faq TEXT,
+    status TEXT NOT NULL DEFAULT 'active',
+    external_id TEXT,
+    source TEXT NOT NULL DEFAULT 'manual',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX idx_products_store_id ON products(store_id);
+CREATE INDEX idx_products_external_id ON products(external_id);
+
+---------------------------------------------------------------
+TABLE chunks
+---------------------------------------------------------------
+
+CREATE TABLE chunks (
+    id TEXT PRIMARY KEY,
+    product_id TEXT REFERENCES products(id) ON DELETE CASCADE,
+    store_id TEXT NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
+    source_type TEXT NOT NULL,
+    field_path TEXT,
+    section_title TEXT,
+    content TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    chunk_index INTEGER NOT NULL,
+    token_estimate INTEGER,
+    qdrant_point_id TEXT,
+    embedding_model TEXT,
+    vector_dim INTEGER,
+    indexed_at TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX idx_chunks_product_id ON chunks(product_id);
+CREATE INDEX idx_chunks_store_id ON chunks(store_id);
+CREATE INDEX idx_chunks_source_type ON chunks(source_type);
+
+---------------------------------------------------------------
+TABLE chunks_fts
+---------------------------------------------------------------
+
+CREATE VIRTUAL TABLE chunks_fts USING fts5(
+    content,
+    section_title,
+    product_name UNINDEXED,
+    chunk_id UNINDEXED,
+    product_id UNINDEXED,
+    store_id UNINDEXED
+);
+
+---------------------------------------------------------------
+TABLE conversations
+---------------------------------------------------------------
+
+CREATE TABLE conversations (
+    id TEXT PRIMARY KEY,
+    store_id TEXT REFERENCES stores(id) ON DELETE SET NULL,
+    title TEXT,
+    context TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+---------------------------------------------------------------
+TABLE messages
+---------------------------------------------------------------
+
+CREATE TABLE messages (
+    id TEXT PRIMARY KEY,
+    conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    role TEXT NOT NULL,
+    content TEXT NOT NULL,
+    sources TEXT,
+    provider TEXT,
+    model TEXT,
+    latency_ms INTEGER,
+    cached INTEGER NOT NULL DEFAULT 0,
+    error_message TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX idx_messages_conversation_id ON messages(conversation_id);
+
+---------------------------------------------------------------
+TABLE usage_metrics
+---------------------------------------------------------------
+
+CREATE TABLE usage_metrics (
+    id TEXT PRIMARY KEY,
+    message_id TEXT NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+    prompt_tokens INTEGER,
+    completion_tokens INTEGER,
+    total_tokens INTEGER,
+    token_source TEXT,
+    estimated_cost REAL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX idx_usage_message_id ON usage_metrics(message_id);
+
+Qdrant storage:
+
+    Qdrant stores only vectors and payload needed for retrieval.
+    SQLite stores chunk content and qdrant_point_id.
+    If Qdrant point is lost, reindex can rebuild it from SQLite chunks.
+
+Consistency strategy:
+
+    - Chunk creation writes SQLite first.
+    - Embedding upsert writes Qdrant point.
+    - SQLite chunk stores qdrant_point_id.
+    - Product deletion deletes SQLite chunks and Qdrant points.
+    - Reindex can delete all points for store/product and rebuild.
+    - Health/reconciliation endpoint can compare SQLite chunk count and
+      Qdrant points count.
+
+=====================================================================
+18. REPOSITORY STRUCTURE
+=====================================================================
+
+Proposed repository layout:
+
+product-support-oss/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── docs/
+│   ├── PROJECT_OVERVIEW.txt
+│   ├── ARCHITECTURE.md
+│   ├── API.md
+│   ├── DEPLOYMENT.md
+│   ├── EVALUATION.md
+│   └── ROADMAP.md
+├── backend/
+│   ├── Cargo.toml
+│   ├── rust-toolchain.toml
+│   ├── migrations/
+│   │   ├── 001_stores.sql
+│   │   ├── 002_products.sql
+│   │   ├── 003_chunks.sql
+│   │   ├── 004_chunks_fts.sql
+│   │   ├── 005_conversations.sql
+│   │   ├── 006_messages.sql
+│   │   └── 007_usage_metrics.sql
+│   └── src/
+│       ├── main.rs
+│       ├── config.rs
+│       ├── error.rs
+│       ├── api/
+│       │   ├── mod.rs
+│       │   ├── health.rs
+│       │   ├── stores.rs
+│       │   ├── products.rs
+│       │   ├── chat.rs
+│       │   ├── ingest.rs
+│       │   ├── chunks.rs
+│       │   └── metrics.rs
+│       ├── domain/
+│       │   ├── mod.rs
+│       │   ├── store.rs
+│       │   ├── product.rs
+│       │   ├── chunk.rs
+│       │   ├── conversation.rs
+│       │   ├── message.rs
+│       │   └── usage.rs
+│       ├── services/
+│       │   ├── mod.rs
+│       │   ├── ingestion_service.rs
+│       │   ├── chunking_service.rs
+│       │   ├── retrieval_service.rs
+│       │   ├── chat_service.rs
+│       │   ├── cache_service.rs
+│       │   ├── reconciliation_service.rs
+│       │   └── metrics_service.rs
+│       ├── rag/
+│       │   ├── mod.rs
+│       │   ├── product_parser.rs
+│       │   ├── chunker.rs
+│       │   ├── retriever.rs
+│       │   ├── reranker.rs
+│       │   └── prompt.rs
+│       ├── llm/
+│       │   ├── mod.rs
+│       │   ├── provider.rs
+│       │   ├── qwen.rs
+│       │   └── openai_compat.rs
+│       ├── embeddings/
+│       │   ├── mod.rs
+│       │   ├── provider.rs
+│       │   └── local.rs
+│       ├── vector_store/
+│       │   ├── mod.rs
+│       │   ├── provider.rs
+│       │   └── qdrant.rs
+│       ├── db/
+│       │   ├── mod.rs
+│       │   ├── sqlite.rs
+│       │   ├── stores_repo.rs
+│       │   ├── products_repo.rs
+│       │   ├── chunks_repo.rs
+│       │   ├── conversations_repo.rs
+│       │   ├── messages_repo.rs
+│       │   └── usage_repo.rs
+│       └── storage/
+│           └── mod.rs
+├── frontend/
+│   ├── package.json
+│   ├── nuxt.config.ts
+│   ├── tsconfig.json
+│   ├── app.vue
+│   ├── pages/
+│   │   ├── index.vue
+│   │   ├── stores.vue
+│   │   ├── products.vue
+│   │   └── dashboard.vue
+│   ├── components/
+│   │   ├── ChatWindow.vue
+│   │   ├── MessageBubble.vue
+│   │   ├── SourcesList.vue
+│   │   ├── StoreTable.vue
+│   │   ├── ProductTable.vue
+│   │   ├── ReindexButton.vue
+│   │   ├── MetricsCards.vue
+│   │   └── ErrorPanel.vue
+│   ├── composables/
+│   │   ├── useApi.ts
+│   │   └── useChat.ts
+│   └── types/
+│       └── api.ts
+├── llm/
+│   ├── Dockerfile
+│   ├── README.md
+│   └── entrypoint.sh
+├── eval/
+│   ├── qa.json
+│   ├── products.json
+│   └── run_eval.sh
+├── scripts/
+│   ├── dev.sh
+│   ├── smoke_test.sh
+│   ├── reindex.sh
+│   └── seed_demo.sh
+├── data/
+│   └── .gitkeep
+├── .env.example
+├── .gitignore
+├── docker-compose.yml
+├── Makefile
+├── README.md
+├── LICENSE
+└── PROJECT_OVERVIEW.txt
+
+=====================================================================
+19. BACKEND MODULE RESPONSIBILITIES
+=====================================================================
+
+api/
+    HTTP handlers, request validation, response serialization.
+
+domain/
+    Core entities and value objects.
+
+services/
+    Business logic:
+        store/product management,
+        ingestion orchestration,
+        chat orchestration,
+        cache lookup,
+        reconciliation,
+        metrics aggregation.
+
+rag/
+    Product data parsing.
+    Chunking.
+    Retrieval.
+    Optional reranking.
+    Prompt construction.
+
+llm/
+    Qwen provider.
+    OpenAI-compatible provider.
+    Streaming support.
+    Usage parsing.
+
+embeddings/
+    Embedding provider abstraction.
+    Local embedding adapter.
+    External embedding adapter optional.
+
+vector_store/
+    Qdrant client.
+    Collection initialization.
+    Point upsert.
+    Point delete.
+    Vector search with filters.
+    Health check.
+
+db/
+    SQLite repositories and migrations.
+
+=====================================================================
+20. FRONTEND PAGES
+=====================================================================
+
+Page: /
+
+    Chat page.
+
+    Features:
+        - store selector
+        - question input
+        - streaming answer
+        - markdown rendering
+        - source citations
+        - conversation history
+        - low-confidence warning
+        - error panel
+        - demo question buttons
+
+Page: /stores
+
+    Stores page.
+
+    Features:
+        - create store
+        - list stores
+        - store status
+        - product count
+        - chunk count
+        - qdrant points count
+        - reindex store
+
+Page: /products
+
+    Products page.
+
+    Features:
+        - store filter
+        - product list
+        - product status
+        - source type
+        - external_id
+        - chunk count
+        - indexed_at
+        - add product
+        - edit product
+        - delete product
+        - reindex product
+
+Page: /dashboard
+
+    Usage observability.
+
+    Features:
+        - total stores
+        - total products
+        - total chunks
+        - qdrant points count
+        - total conversations
+        - total messages
+        - success rate
+        - total tokens
+        - average latency
+        - cache hit rate
+        - retrieval stats
+        - recent errors
+        - model/provider info
+
+=====================================================================
+21. DOCKER COMPOSE DESIGN
+=====================================================================
+
+Services:
+
+    frontend:
+        Nuxt 3 app.
+        Public port 3000.
+
+    backend:
+        Rust Axum API.
+        Public port 8081.
+        Depends on Qdrant and LLM runtime.
+        Mounts SQLite volume.
+
+    qdrant:
+        Qdrant vector database.
+        Internal port 6333.
+        Optional local debug port mapping.
+        Persistent volume for storage.
+
+    llm:
+        Qwen 2.5 runtime container.
+        Also may serve embedding model.
+        Internal network only.
+
+Volumes:
+
+    ./data:/app/data
+    qdrant_storage:/qdrant/storage
+    Optional model cache volume for LLM weights.
+
+Example compose shape:
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NUXT_PUBLIC_API_BASE: http://localhost:8081
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "8081:8081"
+    environment:
+      DATABASE_URL: sqlite://./data/product_support.db
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: product_support_chunks
+      VECTOR_DIM: 768
+      LLM_BASE_URL: http://llm:11434
+      LLM_MODEL: qwen2.5:1.5b-instruct
+      EMBEDDING_BASE_URL: http://llm:11434
+      EMBEDDING_MODEL: nomic-embed-text
+      INTERNAL_API_TOKEN: change-me
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - qdrant
+      - llm
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+  llm:
+    image: ollama/ollama:latest
+    volumes:
+      - llm_cache:/root/.ollama
+
+volumes:
+  qdrant_storage:
+  llm_cache:
+
+Model preparation:
+
+    docker compose exec llm ollama pull qwen2.5:1.5b-instruct
+    docker compose exec llm ollama pull nomic-embed-text
+
+Notes:
+
+    In production-like setup, do not expose Qdrant publicly.
+    Use Docker internal network and QDRANT_API_KEY if needed.
+
+=====================================================================
+22. OBSERVABILITY AND DASHBOARD
+=====================================================================
+
+Metrics to track:
+
+    Store count.
+    Product count.
+    Chunk count.
+    Qdrant point count.
+    Conversation count.
+    Message count.
+    Success count.
+    Failed count.
+    Cache hit count.
+    Total prompt tokens.
+    Total completion tokens.
+    Total tokens.
+    Average latency.
+    P95 latency if practical.
+    Retrieval count.
+    Average retrieved chunks.
+    Average top retrieval score.
+    Low-confidence answer count.
+    Qdrant error count.
+    Embedding error count.
+    LLM error count.
+    Last error messages.
+    Model name.
+    Provider name.
+
+Dashboard cards:
+
+    Total stores
+    Total products
+    Total chunks
+    Qdrant points
+    Total chats
+    Total messages
+    Success rate
+    Cache hit rate
+    Total tokens
+    Avg latency
+    Low-confidence answers
+    Model
+    Provider
+
+Recent messages table columns:
+
+    Created at
+    Store
+    Conversation
+    Question
+    Answer preview
+    Sources count
+    Tokens
+    Latency
+    Cached
+    Status
+
+=====================================================================
+23. SECURITY CONSIDERATIONS
+=====================================================================
+
+Input validation:
+
+    Limit question length.
+    Validate product payload.
+    Sanitize store/product identifiers.
+    Reject oversized payloads.
+    Validate JSON specs and FAQ structures.
+
+Qdrant security:
+
+    Qdrant should be internal-only.
+    Do not expose port 6333 publicly in production.
+    Use QDRANT_API_KEY if Qdrant is exposed outside trusted network.
+    Validate store_id filters to prevent cross-store retrieval.
+
+LLM integration:
+
+    LLM runtime should be internal-only.
+    Use internal token if supported.
+    Do not expose model endpoint publicly.
+    Treat model output as untrusted.
+    Do not render raw HTML from model output.
+
+Prompt injection:
+
+    Retrieved chunks must not override system rules.
+    System prompt must remain controlled by backend.
+    Do not pass arbitrary user instructions into system prompt.
+    Mark retrieved chunks as context data.
+    Validate citation format if used.
+
+Secrets:
+
+    Use .env file for local development.
+    Provide .env.example.
+    Do not commit secrets.
+    Do not store API keys in frontend bundle.
+
+=====================================================================
+24. TESTING STRATEGY
+=====================================================================
+
+Backend unit tests:
+
+    Product parser.
+    Chunker.
+    Prompt builder.
+    Retrieval score normalization.
+    SQLite repository behavior.
+    Qdrant filter builder.
+    Token usage parsing.
+    Message validation.
+
+Backend integration tests:
+
+    Health endpoint.
+    Store/product CRUD.
+    Reindex endpoint with demo products.
+    Chat endpoint with mock LLM.
+    Qdrant mock or test container.
+    Retrieval returns expected chunks.
+    Low-context answer path.
+    Invalid LLM response handling.
+    Metrics summary endpoint.
+
+Frontend tests:
+
+    Chat rendering.
+    Store selector.
+    Product table.
+    Source rendering.
+    Error display.
+    Dashboard metrics rendering.
+    Reindex action.
+
+E2E smoke test:
+
+    Start docker compose.
+    Pull models.
+    Check /api/v1/health.
+    Create demo store.
+    Create demo products.
+    Reindex products.
+    Ask demo question.
+    Receive answer with sources.
+    Verify history contains message.
+    Verify dashboard metrics increased.
+
+Evaluation dataset:
+
+    eval/qa.json
+    eval/products.json
+
+Example:
+
+    [
+      {
+        "question": "What material is the red t-shirt made of?",
+        "expected_sources": ["product_456"],
+        "expected_keywords": ["cotton", "material"]
+      },
+      {
+        "question": "Can I return the red t-shirt?",
+        "expected_sources": ["product_456"],
+        "expected_keywords": ["return", "14 days"]
+      }
+    ]
+
+=====================================================================
+25. ACCEPTANCE CRITERIA FOR MVP
+=====================================================================
+
+The MVP is complete when:
+
+    1. Docker Compose starts all services.
+    2. Frontend is available at localhost:3000.
+    3. Backend health endpoint returns ok.
+    4. Qdrant is reachable from backend.
+    5. Qdrant collection is created automatically.
+    6. User can create store.
+    7. User can add products manually or via API.
+    8. Reindex endpoint creates chunks.
+    9. Embeddings are generated.
+    10. Qdrant points are upserted.
+    11. Chat endpoint retrieves relevant chunks.
+    12. Retrieval respects store_id filter.
+    13. Qwen 2.5 returns grounded answer.
+    14. UI displays answer and sources.
+    15. If product data lacks answer, system says so.
+    16. Backend stores messages.
+    17. Backend stores token usage.
+    18. Backend stores latency.
+    19. Dashboard shows request/token metrics.
+    20. Dashboard shows Qdrant point count.
+    21. README explains how to run project.
+    22. PROJECT_OVERVIEW.txt exists.
+    23. .env.example exists.
+    24. Demo seed script exists.
+    25. Smoke test passes.
+
+=====================================================================
+26. ARCHITECTURE DECISIONS
+=====================================================================
+
+Decision 1: Rust backend
+
+    Reason:
+        Performance, safety, strong portfolio signal, alignment with
+        Korgi.Beats and Korgi.Vision services.
+
+Decision 2: SQLite3 for relational MVP data
+
+    Reason:
+        Zero external relational database dependency.
+        Easy local demo.
+        Enough for single-node OSS demo.
+        Simple backup as one file.
+
+    Trade-off:
+        Not suitable for high-concurrency production without migration.
+        Commercial version should consider PostgreSQL.
+
+Decision 3: Qdrant for vector search
+
+    Reason:
+        Dedicated vector DB with filtering, payload indexes, and
+        scalable retrieval.
+        Better than storing embeddings only in SQLite for RAG demo.
+        Shows production-like AI architecture.
+
+    Trade-off:
+        Adds another service to Docker Compose.
+        Requires consistency handling between SQLite and Qdrant.
+
+Decision 4: Qwen 2.5 as local chat LLM
+
+    Reason:
+        Good lightweight local LLM option.
+        Can run in Docker.
+        Suitable for grounded support answers.
+
+    Trade-off:
+        CPU inference may be slow.
+        Context length should be limited.
+        Model output must be validated.
+
+Decision 5: Separate embedding model
+
+    Reason:
+        Qwen chat model is not an embedding model.
+        Retrieval requires vector representations.
+
+    Trade-off:
+        Need another small model in runtime.
+        Embedding quality affects retrieval.
+        For Russian docs, embedding model choice matters.
+
+Decision 6: Hybrid retrieval
+
+    Reason:
+        Qdrant captures semantic similarity.
+        SQLite FTS captures exact keywords.
+        Hybrid improves product QA reliability.
+
+Decision 7: Token usage tracking from day one
+
+    Reason:
+        AI systems must be observable.
+        Commercial product needs cost and usage analytics.
+        Portfolio project should demonstrate production thinking.
+
+Decision 8: Provider abstraction
+
+    Reason:
+        Qwen runtime may be replaced by:
+            Ollama
+            llama.cpp server
+            OpenAI-compatible API
+            custom inference server
+
+        Qdrant may be replaced by:
+            pgvector
+            Milvus
+            Weaviate
+
+        Backend should not depend on one implementation.
+
+=====================================================================
+27. RISKS AND MITIGATIONS
+=====================================================================
+
+Risk 1:
+    Qwen 2.5 hallucinates despite retrieved context.
+
+Mitigation:
+    Low temperature.
+    Strict system prompt.
+    Source citations.
+    Low-confidence answer path.
+    Evaluation dataset.
+
+Risk 2:
+    Retrieval quality is poor for Russian product data.
+
+Mitigation:
+    Use hybrid retrieval.
+    Choose multilingual embedding model.
+    Tune chunk size.
+    Store product names and spec keys in chunks.
+    Add synonyms/keyword normalization later.
+
+Risk 3:
+    Embedding model does not support Russian well.
+
+Mitigation:
+    Prefer multilingual embedding model if available.
+    Use SQLite FTS keyword retrieval as fallback.
+    Document limitation.
+    Allow external embedding provider.
+
+Risk 4:
+    CPU inference is slow.
+
+Mitigation:
+    Use qwen2.5:1.5b-instruct for MVP.
+    Limit context.
+    Cache repeated questions.
+    Show latency metrics.
+    Document hardware expectations.
+
+Risk 5:
+    SQLite and Qdrant become inconsistent.
+
+Mitigation:
+    Store qdrant_point_id in SQLite chunks.
+    Provide reindex endpoint.
+    Provide reconciliation endpoint.
+    Delete product should delete both SQLite chunks and Qdrant points.
+    Force reindex can rebuild collection payload for store.
+
+Risk 6:
+    Qdrant collection dimension mismatch after changing embedding model.
+
+Mitigation:
+    Store VECTOR_DIM in config.
+    Health check compares expected dimension and collection config.
+    Reindex script can recreate collection.
+    Include embedding_model in payload and chunk metadata.
+
+Risk 7:
+    Product data contains instructions that could inject prompt.
+
+Mitigation:
+    Treat chunks as data.
+    Keep system prompt controlled.
+    Do not execute instructions from chunks.
+    Sanitize rendered output in UI.
+
+Risk 8:
+    Token usage unavailable from runtime.
+
+Mitigation:
+    Use runtime-reported usage if available.
+    Otherwise estimate tokens.
+    Store token_source field.
+
+=====================================================================
+28. ROADMAP
+=====================================================================
+
+Phase 0: Repository bootstrap
+
+    Create repo.
+    Add LICENSE.
+    Add README skeleton.
+    Add PROJECT_OVERVIEW.txt.
+    Add .gitignore.
+    Add .env.example.
+    Add folder structure.
+
+Phase 1: Backend skeleton
+
+    Axum server.
+    Config loading.
+    Health endpoint.
+    SQLite connection.
+    Migrations.
+    Error handling.
+    Tracing/logging.
+
+Phase 2: Stores and products
+
+    Stores CRUD.
+    Products CRUD.
+    Product specs JSON validation.
+    Product FAQ validation.
+    External ID and source fields.
+    Seed demo script.
+
+Phase 3: Knowledge ingestion
+
+    Product parser.
+    Chunking service.
+    Content hashing.
+    Chunk persistence.
+    Reindex endpoint.
+    Ingestion status endpoint.
+
+Phase 4: Qdrant integration
+
+    Qdrant client.
+    Collection initialization.
+    Payload indexes.
+    Point upsert.
+    Point delete.
+    Store/product filter search.
+    Health check.
+    Reconciliation endpoint.
+
+Phase 5: Embeddings
+
+    Embedding provider trait.
+    Local embedding adapter.
+    Batch embedding.
+    Vector dimension validation.
+    Embedding model metadata.
+
+Phase 6: Retrieval
+
+    Qdrant retrieval.
+    SQLite FTS5 retrieval.
+    Score fusion.
+    Top-K selection.
+    Source metadata.
+    Low-confidence path.
+
+Phase 7: Qwen chat integration
+
+    Provider trait.
+    Qwen adapter.
+    OpenAI-compatible adapter optional.
+    Prompt builder.
+    Streaming if practical.
+    Usage parsing.
+
+Phase 8: Chat API and persistence
+
+    Conversations.
+    Messages.
+    Sources.
+    Error handling.
+    Low-confidence path.
+
+Phase 9: Frontend MVP
+
+    Nuxt app.
+    Chat page.
+    Stores page.
+    Products page.
+    Sources list.
+    Reindex button.
+    API client.
+
+Phase 10: Dashboard
+
+    Metrics endpoint.
+    Dashboard page.
+    Metrics cards.
+    Recent messages table.
+    Qdrant status card.
+
+Phase 11: Dockerization
+
+    Backend Dockerfile.
+    Frontend Dockerfile.
+    Qdrant service.
+    LLM runtime compose.
+    Model pull scripts.
+    Healthchecks.
+    Volumes.
+
+Phase 12: Evaluation and docs
+
+    Golden QA dataset.
+    Demo products dataset.
+    Eval script.
+    README.
+    API.md.
+    ARCHITECTURE.md.
+    DEPLOYMENT.md.
+    ROADMAP.md.
+
+Future commercial phase:
+
+    Authentication.
+    API keys.
+    Multi-store workspaces.
+    Webhooks.
+    PostgreSQL.
+    Qdrant cluster.
+    Object storage.
+    Queue workers.
+    PIM connectors.
+    Human escalation.
+    Feedback analytics.
+    Sentiment-based routing.
+    Billing and usage limits.
+
+=====================================================================
+29. COMMERCIAL PRODUCT SEED
+=====================================================================
+
+The OSS repository should be designed so it can later become the core
+of a commercial product without full rewrite.
+
+Commercial separation proposal:
+
+    Open-source core:
+        - local product RAG
+        - single-node demo
+        - SQLite
+        - Qdrant single node
+        - basic dashboard
+        - demo deployment
+
+    Commercial extensions:
+        - multi-tenant accounts
+        - API keys
+        - usage billing
+        - multiple stores/workspaces
+        - product access permissions
+        - PIM/ERP connectors
+        - support desk integrations
+        - feedback loop
+        - analytics
+        - PostgreSQL
+        - Qdrant cluster/high availability
+        - object storage
+        - queue workers
+        - human escalation
+        - SLA observability
+        - cloud LLM routing
+
+Important:
+    Keep commercial secrets and proprietary modules outside public repo.
+    Public repo should remain safe to run locally and easy to demo.
+
+=====================================================================
+30. README MESSAGE DRAFT
+=====================================================================
+
+Suggested short README intro:
+
+    Product Support OSS is a local RAG-based AI support assistant for
+    e-commerce product catalogs, built with Rust, Axum, SQLite, Qdrant,
+    Docker, Qwen 2.5, and Nuxt 3.
+
+    It indexes stores, products, technical specifications, descriptions,
+    FAQ, and manuals, retrieves relevant knowledge from Qdrant, and
+    answers customer support questions with citations, token usage,
+    latency metrics, and low-confidence guardrails.
+
+    The project is an open-source demo, portfolio seed, and foundation
+    for the future commercial product korgi.support.
+
+=====================================================================
+31. DEMO SCRIPT
+=====================================================================
+
+A good demo flow for README or video:
+
+    1. Start project with docker compose.
+    2. Pull Qwen 2.5 and embedding model.
+    3. Open frontend.
+    4. Create demo store.
+    5. Add demo products.
+    6. Open Products page.
+    7. Click Reindex.
+    8. Show Qdrant points count.
+    9. Ask: "What material is the red t-shirt made of?"
+    10. Show grounded answer with sources.
+    11. Ask a question not present in product data.
+    12. Show low-confidence/no exact answer response.
+    13. Open dashboard.
+    14. Show token usage, latency, Qdrant stats.
+    15. Open conversation history.
+    16. Show stored messages and sources.
+
+=====================================================================
+32. DEFINITION OF SUCCESS
+=====================================================================
+
+The project is successful if:
+
+    1. It can be started with a few commands.
+    2. It looks like a product, not a script.
+    3. It demonstrates RAG engineering discipline.
+    4. It demonstrates Qdrant vector search with metadata filtering.
+    5. It tracks tokens and latency.
+    6. It validates retrieval and LLM output.
+    7. It has clear architecture.
+    8. It has demo stores/products and evaluation cases.
+    9. It can be shown in a resume or interview.
+    10. It can be extended into a commercial product.
+    11. It integrates naturally with Korgi ecosystem.
+    12. It acts as foundation for korgi.support.
+
+=====================================================================
+END OF PROJECT OVERVIEW
+=====================================================================
