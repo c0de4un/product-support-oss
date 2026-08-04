@@ -185,81 +185,34 @@ cp .env.standalone.template .env.standalone
 Запустите проект с локальной LLM:
 
 ```bash
-docker compose --profile standalone up -d
-```
-
-Подтяните модели:
-
-```bash
-docker compose exec llm ollama pull qwen2.5
-docker compose exec llm ollama pull qwen2.5:7b
-docker compose exec llm ollama list
+docker compose --env-file .env.standalone -f standalone.compose.yml up -d --build
 ```
 
 Проверьте логи LLM runtime:
-
 ```bash
 docker compose logs -f llm
 ```
 
 После запуска:
-
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8081
 - API docs: http://localhost:8081/api/docs
 
 Первый запуск может занять время из-за загрузки и подготовки моделей.
 
-### Lightweight version for low resource machines
-
-Создайте `.env.light` из шаблона:
-
-```bash
-cp .env.light.template .env.light
-```
-
-Заполните credentials внешнего OpenAI-compatible provider.
-
-Запустите lightweight version:
-
-```bash
-docker compose --profile lightweight up -d
-```
-
-После запуска:
-
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8081
-- API docs: http://localhost:8081/api/docs
-
 ### Local development
 
-Backend:
-
-```bash
-cd backend
-cargo run
-```
-
-Frontend:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Stop:
-
-```bash
-docker compose down
-```
-
-или:
-
-```bash
-docker compose down -v
-```
+1. Запустить backend
+    ```bash
+   cd backend
+   cargo run
+   ```
+2. Запустить frontend
+    ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
 ### 🧪 Test API
 

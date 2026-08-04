@@ -1,0 +1,24 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: support-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - app-network
+    entrypoint: sh -c 'ollama serve & sleep 5 && ollama pull ${LLM_MODEL:-qwen2.5:1.5b} && wait'
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+    driver: local
