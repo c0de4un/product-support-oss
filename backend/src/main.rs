@@ -1,5 +1,7 @@
+mod auth;
 mod config;
 mod system;
+mod user;
 
 use std::net::SocketAddr;
 use std::str::FromStr;
