@@ -1,38 +1,56 @@
 mod config;
 mod system;
 
-use std::sync::Arc;
 use std::net::SocketAddr;
+use std::str::FromStr;
+use std::sync::Arc;
 use axum::{routing::get, Router};
-use sqlx::sqlite::SqlitePoolOptions;
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use tokio::net::TcpListener;
 use tokio_util::sync::CancellationToken;
-use tokio::signal;
-use crate::config::state::AppState;
+use tracing::info;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
 use crate::config::config::Config;
+use crate::config::state::AppState;
 use crate::system::api::actions::read_health_action::read_health_action;
 
-
 #[tokio::main]
-async fn main() {
-    dotenvy::dotenv().ok();
-    let config = Config::from_env().expect("Failed to load configuration from .env");
+async fn main() -> anyhow::Result<()> {
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::EnvFilter::new(
+            std::env::var("RUST_LOG").unwrap_or_else(|_| "info,tower_http=debug".to_string()),
+        ))
+        .with(tracing_subscriber::fmt::layer())
+        .init();
 
-    println!("Connecting to database: {}", config.db_url);
+    dotenvy::dotenv().ok();
+    let config = Config::from_env()?;
+
+    info!("Connecting to database: {}", config.db_url);
+
+    let db_options = SqliteConnectOptions::from_str(&config.db_url)?
+        .journal_mode(sqlx::sqlite::SqliteJournalMode::Wal)
+        .synchronous(sqlx::sqlite::SqliteSynchronous::Normal)
+        .foreign_keys(true)
+        .create_if_missing(true);
 
     let db_pool = SqlitePoolOptions::new()
-        .max_connections(5)
-        .connect(&config.db_url)
-        .await
-        .expect("Failed to connect to SQLite");
+        .max_connections(1)
+        .connect_with(db_options)
+        .await?;
 
-    println!("✅ Database connected.");
+    sqlx::query("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;")
+        .execute(&db_pool)
+        .await?;
+
+    info!("✅ Database connected.");
 
     sqlx::migrate!("./db/migrations")
         .run(&db_pool)
-        .await
-        .expect("Failed to run migrations");
+        .await?;
 
-    println!("✅ Migrations applied successfully.");
+    info!("✅ Migrations applied successfully.");
 
     let cancel_token = CancellationToken::new();
 
@@ -40,29 +58,34 @@ async fn main() {
 
     let app = Router::new()
         .route("/api/health", get(read_health_action))
-        .with_state(state);
+        .with_state(state)
+        .layer(tower_http::trace::TraceLayer::new_for_http());
 
-    let host = config.http_server_host.clone();
-    let port = config.http_server_port;
-    let addr: SocketAddr = format!("{}:{}", host, port).parse().unwrap();
+    let addr: SocketAddr = format!("{}:{}", config.http_server_host, config.http_server_port)
+        .parse()
+        .expect("Failed to parse socket address");
 
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    println!("🚀 Server listening on {}", listener.local_addr().unwrap());
+    let listener = TcpListener::bind(addr).await?;
+    info!("🚀 Server listening on {}", listener.local_addr()?);
 
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal(cancel_token))
-        .await
-        .unwrap();
+        .await?;
+
+    info!("👋 Server stopped gracefully.");
+    Ok(())
 }
 
 async fn shutdown_signal(token: CancellationToken) {
     let ctrl_c = async {
-        signal::ctrl_c().await.expect("failed to install Ctrl+C handler");
+        tokio::signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
     };
 
     #[cfg(unix)]
     let terminate = async {
-        signal::unix::signal(signal::unix::SignalKind::terminate())
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
             .expect("failed to install signal handler")
             .recv()
             .await;
@@ -76,8 +99,6 @@ async fn shutdown_signal(token: CancellationToken) {
         _ = terminate => {},
     }
 
-    println!("🛑 Shutdown signal received, notifying worker...");
+    info!("🛑 Shutdown signal received, notifying background workers...");
     token.cancel();
-
-    tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
 }
