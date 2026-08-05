@@ -7,12 +7,13 @@ use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;
 use axum::{routing::get, Router};
+use axum::routing::post;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use tokio::net::TcpListener;
 use tokio_util::sync::CancellationToken;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-
+use crate::auth::api::actions::auth_actions_controller::{login, register};
 use crate::config::config::Config;
 use crate::config::state::AppState;
 use crate::system::api::actions::read_health_action::read_health_action;
@@ -60,6 +61,8 @@ async fn main() -> anyhow::Result<()> {
 
     let app = Router::new()
         .route("/api/health", get(read_health_action))
+        .route("/api/auth/register", post(register))
+        .route("/api/auth/login", post(login))
         .with_state(state)
         .layer(tower_http::trace::TraceLayer::new_for_http());
 
