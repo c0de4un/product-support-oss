@@ -1,3 +1,5 @@
 .idea
 .env.standalone
 backend/target
+backend/.env
+backend/database.db

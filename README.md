@@ -111,6 +111,9 @@ The system indexes stores, products, technical specifications, and descriptions,
 
 > Добавьте сюда реальные изображения интерфейса, например `docs/screenshots/chat.png`.
 
+### API: Health-Check
+![Health](assets/postman_health.jpg)
+
 - **Интерфейс: Чат поддержки**
 - **Главный интерфейс: Магазины**
 - **Главный интерфейс: Товары**
