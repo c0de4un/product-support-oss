@@ -1,5 +1,5 @@
 use chrono::{Duration, Utc};
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation, errors::Error};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation, errors::Error};
 use uuid::Uuid;
 use crate::config::config::Config;
 use crate::auth::domain::claims::Claims;
@@ -22,10 +22,13 @@ pub fn create_jwt(user_id: &Uuid, config: &Config) -> Result<String, Error> {
 }
 
 pub fn verify_jwt(token: &str, config: &Config) -> Result<Claims, Error> {
+    let mut validation = Validation::new(Algorithm::HS256);
+    validation.validate_exp = true;
+
     let token_data = decode::<Claims>(
         token,
         &DecodingKey::from_secret(config.jwt_secret.as_ref()),
-        &Validation::default(),
+        &validation,
     )?;
 
     Ok(token_data.claims)
