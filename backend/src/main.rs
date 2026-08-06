@@ -1,5 +1,8 @@
 mod auth;
+mod catalog;
+mod chat;
 mod config;
+mod store;
 mod system;
 mod user;
 
