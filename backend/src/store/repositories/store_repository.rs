@@ -95,6 +95,21 @@ impl StoreRepository {
         Ok(store)
     }
 
+    pub async fn find_by_domain(&self, domain: &str) -> Result<Option<Store>> {
+        let store = sqlx::query_as::<_, Store>(
+            r#"
+        SELECT id, user_id, name, domain, description, api_token, status, created_at, updated_at
+        FROM stores
+        WHERE domain = ?
+        "#,
+        )
+            .bind(domain)
+            .fetch_optional(&self.pool)
+            .await?;
+
+        Ok(store)
+    }
+
     pub async fn update(
         &self,
         id: Uuid,

@@ -6,6 +6,7 @@ use sqlx::SqlitePool;
 use crate::auth::repositories::api_token_repository::ApiTokenRepository;
 use crate::config::config::Config;
 use crate::store::repositories::store_repository::StoreRepository;
+use crate::store::services::store_service::StoreService;
 use crate::user::repositories::user_repository::UserRepository;
 
 #[derive(Clone)]
@@ -16,6 +17,7 @@ pub struct AppState {
     pub user_repository: Arc<UserRepository>,
     pub api_token_repository: Arc<ApiTokenRepository>,
     pub store_repository: Arc<StoreRepository>,
+    pub store_service: Arc<StoreService>,
 }
 
 impl AppState {
@@ -29,6 +31,8 @@ impl AppState {
         let api_token_repository = Arc::new(ApiTokenRepository::new(db.clone(), tokens_cache));
         let store_repository = Arc::new(StoreRepository::new(db.clone()));
 
+        let store_service = Arc::new(StoreService::new(store_repository.clone()));
+
         Self {
             db,
             config: Arc::new(config),
@@ -36,6 +40,7 @@ impl AppState {
             user_repository,
             api_token_repository,
             store_repository,
+            store_service, // <--- Передаем в стейт
         }
     }
 }
