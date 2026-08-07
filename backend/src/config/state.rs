@@ -8,6 +8,7 @@ use crate::config::config::Config;
 use crate::store::repositories::store_repository::StoreRepository;
 use crate::store::services::store_service::StoreService;
 use crate::user::repositories::user_repository::UserRepository;
+use crate::chat::repositories::chat_repository::ChatRepository;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -18,6 +19,7 @@ pub struct AppState {
     pub api_token_repository: Arc<ApiTokenRepository>,
     pub store_repository: Arc<StoreRepository>,
     pub store_service: Arc<StoreService>,
+    pub chat_repository: Arc<ChatRepository>,
 }
 
 impl AppState {
@@ -33,6 +35,8 @@ impl AppState {
 
         let store_service = Arc::new(StoreService::new(store_repository.clone()));
 
+        let chat_repository = Arc::new(ChatRepository::new(db.clone()));
+
         Self {
             db,
             config: Arc::new(config),
@@ -40,7 +44,8 @@ impl AppState {
             user_repository,
             api_token_repository,
             store_repository,
-            store_service, // <--- Передаем в стейт
+            store_service,
+            chat_repository,
         }
     }
 }
