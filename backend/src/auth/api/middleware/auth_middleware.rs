@@ -47,6 +47,24 @@ impl FromRequestParts<Arc<AppState>> for AuthUser {
             )
         })?;
 
+        state
+            .user_repository
+            .find_by_id(user_id)
+            .await
+            .map_err(|e| {
+                tracing::error!("Database error while checking user: {}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(json!({"error": "Internal server error"})),
+                )
+            })?
+            .ok_or_else(|| {
+                (
+                    StatusCode::UNAUTHORIZED,
+                    Json(json!({"error": "User no longer exists"})),
+                )
+            })?;
+
         Ok(AuthUser { id: user_id })
     }
 }

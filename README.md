@@ -115,6 +115,9 @@ The system indexes stores, products, technical specifications, and descriptions,
 ### API: Register
 ![Health](assets/postman_register.jpg)
 
+### API: Register
+![Health](assets/postman_store_create.jpg)
+
 - **Интерфейс: Чат поддержки**
 - **Главный интерфейс: Магазины**
 - **Главный интерфейс: Товары**

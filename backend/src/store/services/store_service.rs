@@ -66,7 +66,15 @@ impl StoreService {
                 api_token.as_deref(),
             )
             .await
-            .map_err(|e| StoreServiceError::InternalError(e.to_string()))
+            .map_err(|e| {
+                if let Some(sqlx::Error::Database(db_err)) = e.downcast_ref::<sqlx::Error>() {
+                    if db_err.message().contains("FOREIGN KEY constraint failed") {
+                        return StoreServiceError::NotFound;
+                    }
+                }
+
+                StoreServiceError::InternalError(e.to_string())
+            })
     }
 
     pub async fn get_store(&self, user_id: Uuid, store_id: Uuid) -> Result<Store, StoreServiceError> {
@@ -140,7 +148,7 @@ impl StoreService {
 
     pub async fn rotate_api_token(&self, user_id: Uuid, store_id: Uuid) -> Result<Store, StoreServiceError> {
         let existing_store = self.get_store(user_id, store_id).await?;
-        let new_token = format!("krgi_store_{}", Uuid::new_v4().to_string().replace("-", ""));
+        let new_token = format!("{}", Uuid::new_v4().to_string().replace("-", ""));
 
         self.repo
             .update(

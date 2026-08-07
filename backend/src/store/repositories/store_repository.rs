@@ -20,7 +20,7 @@ impl StoreRepository {
         name: &str,
         domain: Option<&str>,
         description: Option<&str>,
-        api_token: Option<&str>, // <--- Добавили
+        api_token: Option<&str>,
     ) -> Result<Store> {
         let id_str = id.to_string();
         let user_id_str = user_id.to_string();

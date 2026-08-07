@@ -3,3 +3,5 @@
 backend/target
 backend/.env
 backend/database.db
+backend/database.db-shm
+backend/database.db-wal

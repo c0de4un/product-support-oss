@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS stores (
     api_token TEXT UNIQUE,
     status TEXT NOT NULL DEFAULT 'active',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    updated_at DATETIME
 );
 
 CREATE INDEX IF NOT EXISTS idx_stores_user_id ON stores(user_id);
