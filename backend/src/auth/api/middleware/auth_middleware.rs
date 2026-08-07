@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use axum::{
     extract::FromRequestParts,
     http::{request::Parts, StatusCode},
@@ -13,10 +14,10 @@ pub struct AuthUser {
     pub id: Uuid,
 }
 
-impl FromRequestParts<AppState> for AuthUser {
+impl FromRequestParts<Arc<AppState>> for AuthUser {
     type Rejection = (StatusCode, Json<serde_json::Value>);
 
-    async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
+    async fn from_request_parts(parts: &mut Parts, state: &Arc<AppState>) -> Result<Self, Self::Rejection> {
         let token = parts
             .headers
             .get("Authorization")
