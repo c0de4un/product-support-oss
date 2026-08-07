@@ -8,6 +8,7 @@ pub struct Store {
     pub name: String,
     pub domain: Option<String>,
     pub description: Option<String>,
+    pub api_token: Option<String>,
     pub status: String,
     pub created_at: String,
     pub updated_at: Option<String>,
