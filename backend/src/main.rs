@@ -29,6 +29,13 @@ use crate::store::api::actions::store_actions_controller::{
     update_store,
 };
 use crate::chat::api::actions::chat_actions_controller::ask_question;
+use crate::catalog::api::actions::product_actions_controller::{
+    create_product,
+    delete_product,
+    get_product,
+    list_products,
+    update_product,
+};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -87,6 +94,17 @@ async fn main() -> anyhow::Result<()> {
             .delete(delete_store),
         )
         .route("/api/chat", post(ask_question))
+        .route(
+            "/api/stores/{store_id}/products",
+            post(create_product).get(list_products),
+        )
+        .route(
+            "/api/products/{product_id}",
+            get(get_product)
+                .put(update_product)
+                .patch(update_product)
+                .delete(delete_product),
+        )
         .with_state(state)
         .layer(tower_http::trace::TraceLayer::new_for_http());
 
