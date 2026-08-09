@@ -7,6 +7,9 @@ pub struct Config {
     pub db_url: String,
     pub jwt_secret: String,
     pub jwt_expires_hours: i64,
+    pub llm_base_url: String,
+    pub llm_model: String,
+    pub llm_api_key: Option<String>,
 }
 
 impl Config {

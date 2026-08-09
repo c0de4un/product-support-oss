@@ -2,6 +2,7 @@ mod auth;
 mod catalog;
 mod chat;
 mod config;
+mod llm;
 mod store;
 mod system;
 mod user;
@@ -27,6 +28,7 @@ use crate::store::api::actions::store_actions_controller::{
     list_stores,
     update_store,
 };
+use crate::chat::api::actions::chat_actions_controller::ask_question;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -84,6 +86,7 @@ async fn main() -> anyhow::Result<()> {
             .patch(update_store)
             .delete(delete_store),
         )
+        .route("/api/chat", post(ask_question))
         .with_state(state)
         .layer(tower_http::trace::TraceLayer::new_for_http());
 

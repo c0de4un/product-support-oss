@@ -118,6 +118,9 @@ The system indexes stores, products, technical specifications, and descriptions,
 ### API: Register
 ![Health](assets/postman_store_create.jpg)
 
+### API: Chat
+![Health](assets/postman_chat.jpg)
+
 - **Интерфейс: Чат поддержки**
 - **Главный интерфейс: Магазины**
 - **Главный интерфейс: Товары**
@@ -197,7 +200,17 @@ docker compose --env-file .env.standalone -f standalone.compose.yml up -d --buil
 
 Проверьте логи LLM runtime:
 ```bash
-docker compose logs -f llm
+docker compose --env-file .env.standalone -f standalone.compose.yml logs -f ollama
+```
+
+Health-check QDrant
+```bash
+curl http://localhost:6333/healthz
+```
+
+Ollama model list
+```bash
+curl http://localhost:11434/api/tags
 ```
 
 После запуска:
