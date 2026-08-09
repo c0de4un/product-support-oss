@@ -13,6 +13,7 @@ use crate::chat::services::chat_service::ChatService;
 use crate::llm::ollama_client::OllamaClient;
 use crate::llm::provider::LlmProvider;
 use crate::catalog::repositories::product_repository::ProductRepository;
+use crate::catalog::services::product_service::ProductService;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -26,6 +27,7 @@ pub struct AppState {
     pub chat_repository: Arc<ChatRepository>,
     pub chat_service: Arc<ChatService>,
     pub product_repository: Arc<ProductRepository>,
+    pub product_service: Arc<ProductService>,
 }
 
 impl AppState {
@@ -56,6 +58,11 @@ impl AppState {
 
         let product_repository = Arc::new(ProductRepository::new(db.clone()));
 
+        let product_service = Arc::new(ProductService::new(
+            product_repository.clone(),
+            store_repository.clone(),
+        ));
+
         Self {
             db,
             config: Arc::new(config),
@@ -67,6 +74,7 @@ impl AppState {
             chat_repository,
             chat_service,
             product_repository,
+            product_service,
         }
     }
 }
